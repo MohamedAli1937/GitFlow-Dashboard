@@ -10,11 +10,45 @@ export function setToken(token: string) {
   cachedUsername = null;
 }
 
+export async function createIssue(owner: string, repo: string, title: string, body: string) {
+  try {
+    const response = await octokit.rest.issues.create({
+      owner,
+      repo,
+      title,
+      body,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Create Issue Error:", error);
+    throw error;
+  }
+}
+
+export async function createPR(owner: string, repo: string, title: string, body: string, head: string, base: string) {
+  if (!octokit) throw new Error("No GitHub token set");
+  try {
+    const response = await octokit.rest.pulls.create({
+      owner,
+      repo,
+      title,
+      body,
+      head,
+      base,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Create PR Error:", error);
+    throw error;
+  }
+}
+
 export async function getRepos() {
   if (!octokit) throw new Error("No GitHub token set");
 
   const res = await octokit.rest.repos.listForAuthenticatedUser({
-    per_page: 20,
+    per_page: 100,
+    sort: "updated",
   });
 
   return res.data.map((repo) => ({
@@ -56,6 +90,7 @@ export async function getRepoDetails(owner: string, repo: string) {
           repo: t.repo,
           state: "all",
           per_page: 100,
+          headers: { 'If-None-Match': '', 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
         }),
 
         octokit!.paginate(octokit!.rest.pulls.list, {
@@ -63,6 +98,7 @@ export async function getRepoDetails(owner: string, repo: string) {
           repo: t.repo,
           state: "all",
           per_page: 100,
+          headers: { 'If-None-Match': '', 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
         }),
       ]);
 
@@ -91,77 +127,14 @@ export async function getRepoDetails(owner: string, repo: string) {
     return isCreator || isAssignee;
   });
 
-  const extractIssueNumbers = (text: string): number[] => {
-    if (!text) return [];
-    const regex = /(?:fixes|closes|resolves|addresses)?\s*#(\d+)/gi;
-    const matches = [...text.matchAll(regex)];
-    return matches.map((m) => parseInt(m[1], 10));
-  };
-  const issueMap = new Map<number, any>();
-  for (const i of allIssues) {
-    if (!i.pull_request) {
-      issueMap.set(i.number, i);
-    }
-  }
-
-  const linkedIssueNumbers = new Set<number>();
-
-  const prPipeline = myPRs.map((pr) => {
-    const foundNumbers = extractIssueNumbers(pr.title || "")
-      .concat(extractIssueNumbers(pr.body || ""))
-      .concat(extractIssueNumbers(pr.head?.ref || ""));
-
-    const linkedIssue = foundNumbers
-      .map((num) => issueMap.get(num))
-      .find((issue) => issue !== undefined);
-
-    if (linkedIssue) {
-      linkedIssueNumbers.add(linkedIssue.number);
-    }
-
-    let status = "open_pr";
-    if (pr.merged_at) {
-      status = "merged_pr";
-    } else if (pr.state === "closed") {
-      status = "closed_pr";
-    }
-
-    return {
-      issue: linkedIssue || null,
-      pr: {
-        id: pr.id,
-        number: pr.number,
-        title: pr.title,
-        state: pr.state,
-        merged: pr.merged_at !== null,
-        repo: pr.base.repo.full_name,
-      },
-      status,
-    };
-  });
-
-  const issuePipeline = myIssues
-    .filter((i) => !linkedIssueNumbers.has(i.number))
-    .map((i) => ({
-      issue: {
-        id: i.id,
-        number: i.number,
-        title: i.title,
-        state: i.state,
-        repo: i.repository_url.split("/").slice(-2).join("/"),
-      },
-      pr: null,
-      status: "in_progress",
-    }));
-
-  const finalPipeline = [...issuePipeline, ...prPipeline];
-
   return {
     issues: myIssues.map((i) => ({
       id: i.id,
       number: i.number,
       title: i.title,
       state: i.state,
+      html_url: i.html_url,
+      body: i.body || "",
       repo: i.repository_url.split("/").slice(-2).join("/"),
     })),
     prs: myPRs.map((p) => ({
@@ -170,8 +143,10 @@ export async function getRepoDetails(owner: string, repo: string) {
       title: p.title,
       state: p.state,
       merged: p.merged_at !== null,
+      html_url: p.html_url,
+      head_ref: p.head?.ref || "",
+      body: p.body || "",
       repo: p.base.repo.full_name,
     })),
-    pipeline: finalPipeline,
   };
 }

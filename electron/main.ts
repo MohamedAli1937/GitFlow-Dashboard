@@ -4,6 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import "./ipc/github.ipc";
+import "./ipc/git.ipc";
+import "./ipc/shell.ipc";
 import { setToken } from "./services/github.service";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
