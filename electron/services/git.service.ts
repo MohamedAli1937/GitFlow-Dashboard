@@ -78,7 +78,7 @@ export async function deleteBranch(path: string, name: string) {
     } catch (deleteErr: any) {
       // If it fails because it's checked out (used by worktree), switch to another branch and retry
       if (deleteErr.message && (deleteErr.message.includes("used by worktree") || deleteErr.message.includes("checked out at"))) {
-        let defaultBranch = branches.all.includes("main") ? "main" : (branches.all.includes("master") ? "master" : null);
+        let defaultBranch = branches.all.includes("main") ? "main" : (branches.all.includes("master") ? "master" : undefined);
         if (!defaultBranch) {
           defaultBranch = branches.all.find(b => b !== name && !b.startsWith("*"));
         }

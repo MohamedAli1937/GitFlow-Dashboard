@@ -11,6 +11,7 @@ export function setToken(token: string) {
 }
 
 export async function createIssue(owner: string, repo: string, title: string, body: string) {
+  if (!octokit) throw new Error("No GitHub token set");
   try {
     const response = await octokit.rest.issues.create({
       owner,
