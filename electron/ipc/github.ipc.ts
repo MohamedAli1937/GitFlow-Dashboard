@@ -10,7 +10,6 @@ import {
 } from "../services/github.service";
 import { store } from "../main";
 
-// --- Account shape stored in electron-store ---
 interface StoredAccount {
   username: string;
   avatar_url: string;
@@ -37,13 +36,10 @@ function setActiveUsername(username: string | null) {
   }
 }
 
-// --- Multi-Account IPC Handlers ---
-
 ipcMain.handle("github:add-account", async (_, token: string) => {
   try {
     const user = await verifyAndSetToken(token);
     const accounts = getAccounts();
-    // Replace if username already exists, otherwise add
     const idx = accounts.findIndex((a) => a.username === user.login);
     const entry: StoredAccount = { username: user.login, avatar_url: user.avatar_url, token };
     if (idx >= 0) {
@@ -53,7 +49,6 @@ ipcMain.handle("github:add-account", async (_, token: string) => {
     }
     saveAccounts(accounts);
     setActiveUsername(user.login);
-    // Also keep legacy key for backward compat
     store.set("github_token", token);
     return { success: true, username: user.login, avatar_url: user.avatar_url };
   } catch (error: any) {
@@ -93,7 +88,6 @@ ipcMain.handle("github:delete-account", async (_, username: string) => {
   const active = getActiveUsername();
   if (active === username) {
     if (accounts.length > 0) {
-      // Switch to first remaining account
       const next = accounts[0];
       await verifyAndSetToken(next.token);
       setActiveUsername(next.username);
@@ -118,13 +112,10 @@ ipcMain.handle("github:get-profile-stats", async () => {
   }
 });
 
-// --- Legacy handlers kept for backward compat ---
-
 ipcMain.handle("github:save-token", async (_, token: string) => {
   try {
     const user = await verifyAndSetToken(token);
     store.set("github_token", token);
-    // Also add to accounts list
     const accounts = getAccounts();
     const idx = accounts.findIndex((a) => a.username === user.login);
     const entry: StoredAccount = { username: user.login, avatar_url: user.avatar_url, token };
@@ -154,8 +145,6 @@ ipcMain.handle("github:has-token", async () => {
   const token = store.get("github_token");
   return typeof token === "string" && token.length > 0;
 });
-
-// --- Core Data Handlers ---
 
 ipcMain.handle("github:get-repos", async () => {
   return await getRepos();

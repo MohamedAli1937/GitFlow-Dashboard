@@ -46,7 +46,6 @@ export async function commitAndPush(path: string, message: string) {
     await git.add(".");
     await git.commit(message);
 
-    // Get current branch name and push with --set-upstream so new branches work
     const branch = await git.revparse(["--abbrev-ref", "HEAD"]);
     await git.push(["-u", "origin", branch]);
     return true;
@@ -73,10 +72,8 @@ export async function deleteBranch(path: string, name: string) {
     const branches = await git.branchLocal();
 
     try {
-      // Force delete the branch
       await git.branch(["-D", name]);
     } catch (deleteErr: any) {
-      // If it fails because it's checked out (used by worktree), switch to another branch and retry
       if (
         deleteErr.message &&
         (deleteErr.message.includes("used by worktree") ||
@@ -93,7 +90,7 @@ export async function deleteBranch(path: string, name: string) {
 
         if (defaultBranch) {
           await git.checkout(defaultBranch);
-          await git.branch(["-D", name]); // Retry delete after switching
+          await git.branch(["-D", name]);
         } else {
           throw new Error("Cannot delete active branch: No other branch exists to switch to.");
         }

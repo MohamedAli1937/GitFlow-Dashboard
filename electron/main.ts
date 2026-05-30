@@ -30,7 +30,6 @@ function createWindow() {
     },
   });
 
-  // Load active account token on startup
   const activeUsername = store.get("active_username") as string | undefined;
   const accounts = (store.get("github_accounts") as any[] | undefined) || [];
   const activeAccount = activeUsername

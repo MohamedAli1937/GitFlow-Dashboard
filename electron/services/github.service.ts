@@ -184,15 +184,9 @@ export async function getRepoDetails(owner: string, repo: string) {
 export async function getUserStats() {
   if (!octokit) throw new Error("No GitHub token set");
 
-  if (!cachedUsername) {
-    const user = await octokit.rest.users.getAuthenticated();
-    cachedUsername = user.data.login;
-  }
-  const username = cachedUsername;
-
   const userInfo = await octokit.rest.users.getAuthenticated();
+  const username = userInfo.data.login;
 
-  // Use Search API to count issues and PRs authored by this user
   let totalIssues = 0;
   let totalPRs = 0;
   try {
@@ -201,8 +195,8 @@ export async function getUserStats() {
       per_page: 1,
     });
     totalIssues = issueSearch.data.total_count;
-  } catch {
-    /* search may fail on rate limit, default to 0 */
+  } catch (err) {
+    console.error("Search issues error for stats:", err);
   }
 
   try {
@@ -211,8 +205,26 @@ export async function getUserStats() {
       per_page: 1,
     });
     totalPRs = prSearch.data.total_count;
-  } catch {
-    /* search may fail on rate limit, default to 0 */
+  } catch (err) {
+    console.error("Search PRs error for stats:", err);
+  }
+
+  const rawPrivate =
+    (userInfo.data as any).total_private_repos ?? (userInfo.data as any).owned_private_repos;
+  let totalReposCount = userInfo.data.public_repos + (rawPrivate || 0);
+
+  if (rawPrivate === undefined || rawPrivate === 0) {
+    try {
+      const reposResponse = await octokit.rest.repos.listForAuthenticatedUser({
+        per_page: 100,
+        type: "owner",
+      });
+      if (reposResponse.data.length > totalReposCount) {
+        totalReposCount = reposResponse.data.length;
+      }
+    } catch (err) {
+      console.error("Failed to list repos as fallback for stats:", err);
+    }
   }
 
   return {
@@ -223,7 +235,7 @@ export async function getUserStats() {
     followers: userInfo.data.followers,
     following: userInfo.data.following,
     public_repos: userInfo.data.public_repos,
-    total_repos: userInfo.data.public_repos + (userInfo.data.total_private_repos || 0),
+    total_repos: totalReposCount,
     total_issues: totalIssues,
     total_prs: totalPRs,
     html_url: userInfo.data.html_url,

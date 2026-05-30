@@ -1,7 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { electronAPI } from "./api/bridge";
 
-// --- GitHub Octicons & Custom SVGs ---
 const GithubLogoIcon = ({ size = 20, style = {}, ...props }) => (
   <svg
     viewBox="0 0 16 16"
@@ -370,6 +369,430 @@ export default function App() {
   const [profileStats, setProfileStats] = useState<any>(null);
   const [showAddAccount, setShowAddAccount] = useState(false);
 
+  const renderHelpGuideModal = () => {
+    if (!isHelpOpen) return null;
+    return (
+      <div
+        onClick={() => setIsHelpOpen(false)}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100vw",
+          height: "100vh",
+          backgroundColor: "rgba(0,0,0,0.85)",
+          zIndex: 20000,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          padding: "20px",
+          boxSizing: "border-box",
+        }}
+      >
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            width: "100%",
+            maxWidth: "1100px",
+            backgroundColor: "#0B0F19",
+            border: "1px solid #1F293D",
+            borderRadius: "20px",
+            padding: "48px",
+            color: "#F8FAFC",
+            boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
+            position: "relative",
+            fontFamily: "inherit",
+          }}
+        >
+          <button
+            onClick={() => setIsHelpOpen(false)}
+            style={{
+              position: "absolute",
+              top: "24px",
+              right: "24px",
+              background: "none",
+              border: "none",
+              color: "#94A3B8",
+              cursor: "pointer",
+              fontSize: "24px",
+              fontWeight: 300,
+              transition: "color 0.2s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}
+          >
+            ✕
+          </button>
+
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              marginBottom: "50px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                marginBottom: "8px",
+              }}
+            >
+              <GithubLogoIcon size={32} style={{ color: "#F8FAFC" }} />
+              <h2
+                style={{
+                  margin: 0,
+                  fontSize: "32px",
+                  fontWeight: 800,
+                  color: "#fff",
+                  letterSpacing: "-0.5px",
+                }}
+              >
+                Help Guide
+              </h2>
+            </div>
+            <p style={{ color: "#94A3B8", margin: 0, fontSize: "15px", textAlign: "center" }}>
+              See how the app automates your workflow on GitHub
+            </p>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-start",
+              position: "relative",
+              gap: "10px",
+            }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: "74px",
+                left: "8%",
+                right: "8%",
+                height: "3px",
+                background:
+                  "linear-gradient(to right, #3B82F6 0%, #10B981 20%, #8B5CF6 40%, #F59E0B 60%, #EF4444 80%, #10B981 100%)",
+                zIndex: 1,
+                opacity: 0.8,
+              }}
+            />
+
+            {[
+              {
+                num: 1,
+                title: "Create Issue",
+                desc: "The app creates a new GitHub issue.",
+                color: "#3B82F6",
+                glow: "rgba(59, 130, 246, 0.15)",
+                icon: <IssueOpenedIcon size={24} style={{ color: "#3B82F6" }} />,
+                badge: (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      padding: "4px 10px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      border: "1px solid rgba(59, 130, 246, 0.3)",
+                      backgroundColor: "rgba(59, 130, 246, 0.1)",
+                      color: "#3B82F6",
+                    }}
+                  >
+                    #1
+                  </span>
+                ),
+              },
+              {
+                num: 2,
+                title: "Create Branch",
+                desc: "",
+                color: "#10B981",
+                glow: "rgba(16, 185, 129, 0.15)",
+                icon: <BranchIcon size={24} style={{ color: "#10B981" }} />,
+                badge: (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      gap: "6px",
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        padding: "4px 10px",
+                        borderRadius: "6px",
+                        fontSize: "12px",
+                        fontWeight: 700,
+                        border: "1px solid rgba(16, 185, 129, 0.3)",
+                        backgroundColor: "rgba(16, 185, 129, 0.1)",
+                        color: "#10B981",
+                      }}
+                    >
+                      feature/test
+                    </span>
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        fontSize: "11px",
+                        color: "#64748B",
+                        fontWeight: 600,
+                      }}
+                    >
+                      <span>✏️ Rename</span>
+                      <br />
+                      <span>🗑️ Delete</span>
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                num: 3,
+                title: "Update Code",
+                desc: "Make changes to your code in VS Code.",
+                color: "#8B5CF6",
+                glow: "rgba(139, 92, 246, 0.15)",
+                icon: <VSCodeIcon size={24} style={{ color: "#8B5CF6" }} />,
+                badge: (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "6px 12px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      border: "1px solid rgba(139, 92, 246, 0.3)",
+                      backgroundColor: "rgba(139, 92, 246, 0.1)",
+                      color: "#a78bfa",
+                    }}
+                  >
+                    <VSCodeIcon size={12} style={{ color: "#29b6f6" }} /> Open VS Code
+                  </span>
+                ),
+              },
+              {
+                num: 4,
+                title: "Commit & Push",
+                desc: "The app commits your changes and pushes them to GitHub.",
+                color: "#F59E0B",
+                glow: "rgba(245, 158, 11, 0.15)",
+                icon: (
+                  <svg
+                    viewBox="0 0 24 24"
+                    width={24}
+                    height={24}
+                    fill="none"
+                    stroke="#F59E0B"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{ display: "inline-block", verticalAlign: "middle" }}
+                  >
+                    <circle cx="12" cy="12" r="4" />
+                    <line x1="1.05" y1="12" x2="7.95" y2="12" />
+                    <line x1="16.05" y1="12" x2="22.95" y2="12" />
+                  </svg>
+                ),
+                badge: (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "6px 12px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      border: "1px solid rgba(245, 158, 11, 0.3)",
+                      backgroundColor: "rgba(245, 158, 11, 0.1)",
+                      color: "#F59E0B",
+                    }}
+                  >
+                    <CheckIcon size={12} style={{ color: "#F59E0B" }} /> Clean repository
+                  </span>
+                ),
+              },
+              {
+                num: 5,
+                title: "Pull Request",
+                desc: "A pull request is created automatically.",
+                color: "#EF4444",
+                glow: "rgba(239, 68, 68, 0.15)",
+                icon: <PrOpenedIcon size={24} style={{ color: "#EF4444" }} />,
+                badge: (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      padding: "4px 10px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      border: "1px solid rgba(239, 68, 68, 0.3)",
+                      backgroundColor: "rgba(239, 68, 68, 0.1)",
+                      color: "#EF4444",
+                    }}
+                  >
+                    PR #2
+                  </span>
+                ),
+              },
+              {
+                num: 6,
+                title: "Status",
+                desc: "Track the status of your workflow in real time.",
+                color: "#10B981",
+                glow: "rgba(16, 185, 129, 0.15)",
+                icon: <CheckIcon size={24} style={{ color: "#10B981" }} />,
+                badge: (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      padding: "6px 12px",
+                      borderRadius: "6px",
+                      fontSize: "12px",
+                      fontWeight: 700,
+                      border: "1px solid rgba(16, 185, 129, 0.3)",
+                      backgroundColor: "rgba(16, 185, 129, 0.1)",
+                      color: "#10B981",
+                    }}
+                  >
+                    <CheckIcon size={12} /> Success
+                  </span>
+                ),
+              },
+            ].map((step, idx) => (
+              <div
+                key={step.num}
+                style={{
+                  flex: 1,
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  textAlign: "center",
+                  zIndex: 2,
+                  position: "relative",
+                }}
+              >
+                {idx < 5 && (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "72px",
+                      left: "calc(100% - 3px)",
+                      width: "6px",
+                      height: "6px",
+                      borderRadius: "50%",
+                      backgroundColor: "#fff",
+                      boxShadow: "0 0 8px rgba(255,255,255,0.8)",
+                      zIndex: 3,
+                    }}
+                  />
+                )}
+
+                <div
+                  style={{
+                    marginBottom: "14px",
+                    display: "flex",
+                    justifyContent: "center",
+                    height: "30px",
+                  }}
+                >
+                  {step.icon}
+                </div>
+
+                <div
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "50%",
+                    backgroundColor: "#0B0F19",
+                    border: `4px solid ${step.color}`,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "18px",
+                    fontWeight: 800,
+                    color: "#fff",
+                    boxShadow: `0 0 20px ${step.glow}`,
+                    marginBottom: "16px",
+                  }}
+                >
+                  {step.num}
+                </div>
+
+                <h3
+                  style={{
+                    margin: "0 0 10px 0",
+                    fontSize: "14px",
+                    fontWeight: 700,
+                    color: "#fff",
+                  }}
+                >
+                  {step.title}
+                </h3>
+
+                <div
+                  style={{
+                    marginBottom: "12px",
+                    minHeight: "45px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {step.badge}
+                </div>
+
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "12px",
+                    color: "#64748B",
+                    lineHeight: 1.4,
+                    padding: "0 8px",
+                  }}
+                >
+                  {step.desc}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <div
+            style={{
+              marginTop: "48px",
+              backgroundColor: "rgba(59, 130, 246, 0.05)",
+              border: "1px solid rgba(59, 130, 246, 0.15)",
+              borderRadius: "12px",
+              padding: "16px 20px",
+              display: "flex",
+              alignItems: "center",
+              gap: "12px",
+            }}
+          >
+            <span style={{ color: "#3B82F6", display: "flex", alignItems: "center" }}>
+              <InfoIcon size={20} />
+            </span>
+            <p style={{ margin: 0, fontSize: "14px", color: "#94A3B8", fontWeight: 500 }}>
+              From issue creation to pull request – the app handles the entire workflow so you
+              can focus on building.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const branchDropdownRef = useRef<HTMLDivElement | null>(null);
 
   const fetchAccountsAndStats = async () => {
@@ -475,7 +898,6 @@ export default function App() {
     return () => clearInterval(interval);
   }, [selectedRepo, localPaths]);
 
-  // Silent GitHub auto-refresh
   useEffect(() => {
     if (!selectedRepo) return;
     const interval = setInterval(() => {
@@ -587,7 +1009,6 @@ export default function App() {
     try {
       await electronAPI.createBranch(localPaths[selectedRepo], branchName);
 
-      // Always auto-link the branch to the current item
       if (selectedItem?.number) {
         setManualBranchLinks((prev) => ({ ...prev, [selectedItem.number]: branchName }));
       }
@@ -608,7 +1029,6 @@ export default function App() {
       await electronAPI.renameBranch(localPaths[selectedRepo], oldName, newName);
       setRenamingBranch(null);
 
-      // Auto-link the new name to any issue that was linked to the old name
       setManualBranchLinks((prev) => {
         const next = { ...prev };
         for (const [key, linkedName] of Object.entries(next)) {
@@ -617,7 +1037,6 @@ export default function App() {
         return next;
       });
 
-      // Also link to the current selectedItem's issue if viewing detail page
       if (selectedItem?.number) {
         setManualBranchLinks((prev) => ({ ...prev, [selectedItem.number]: newName }));
       }
@@ -633,7 +1052,6 @@ export default function App() {
     if (!selectedRepo || !localPaths[selectedRepo]) return;
     if (!confirm(`Delete branch "${name}"?`)) return;
 
-    // Always clear manual links for this branch name, regardless of success/failure
     setManualBranchLinks((prev) => {
       const next = { ...prev };
       for (const [key, linkedName] of Object.entries(next)) {
@@ -642,7 +1060,6 @@ export default function App() {
       return next;
     });
 
-    // Optimistically remove from gitStatus so UI updates immediately
     setGitStatus((prev: any) =>
       prev
         ? {
@@ -661,7 +1078,6 @@ export default function App() {
       }
     }
 
-    // Refresh real status from git
     try {
       const status = await electronAPI.getGitStatus(localPaths[selectedRepo]);
       setGitStatus(status);
@@ -713,7 +1129,6 @@ export default function App() {
       const newIssue = await electronAPI.createIssue(selectedRepo, title, body);
       setIsCreateModalOpen(false);
 
-      // Optimistically add to the UI immediately
       setData((prev: any) => {
         if (!prev) return prev;
         return {
@@ -764,7 +1179,6 @@ export default function App() {
       const details = await electronAPI.getRepoDetails(fullName);
       setData(details);
 
-      // If silently refreshing, keep the currently selected item up to date
       if (silent) {
         setSelectedItem((prev: any) => {
           if (!prev) return null;
@@ -839,7 +1253,6 @@ export default function App() {
     );
   }
 
-  // --- VIEW 1: DETAIL PAGE ---
   if (selectedRepo && data && selectedItem) {
     const isIssue = selectedItem.type === "issue";
     const isPR = selectedItem.type === "pr";
@@ -863,7 +1276,6 @@ export default function App() {
     const isMerged = isPR && selectedItem.merged;
     const done = isClosed || isMerged;
 
-    // Status config for headers & status cards
     const statusConfig = isMerged
       ? {
           label: "Merged",
@@ -900,6 +1312,7 @@ export default function App() {
           flexDirection: "column",
         }}
       >
+        {renderHelpGuideModal()}
         <div style={{ display: "flex", alignItems: "center", marginBottom: "20px" }}>
           <button
             onClick={() => setSelectedItem(null)}
@@ -991,7 +1404,6 @@ export default function App() {
           }}
         >
           <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-            {/* Step 1 */}
             <div
               style={{
                 display: "flex",
@@ -1021,7 +1433,6 @@ export default function App() {
                 <CheckIcon size={16} /> {isIssue ? `#${itemNum}` : linkedPR ? "Linked" : "N/A"}
               </div>
             </div>
-            {/* Step 2: Branch */}
             <div
               style={{
                 display: "flex",
@@ -1222,7 +1633,6 @@ export default function App() {
                 )}
               </div>
             </div>
-            {/* Step 3: Code */}
             <div
               style={{
                 display: "flex",
@@ -1273,7 +1683,6 @@ export default function App() {
                 </button>
               )}
             </div>
-            {/* Step 4: Commit */}
             <div
               style={{
                 padding: "16px 20px",
@@ -1370,7 +1779,6 @@ export default function App() {
                 </div>
               )}
             </div>
-            {/* Step 5: PR */}
             <div
               style={{
                 padding: "16px 20px",
@@ -1499,7 +1907,6 @@ export default function App() {
                 </div>
               )}
             </div>
-            {/* Step 6: Status */}
             <div
               style={{
                 display: "flex",
@@ -1540,14 +1947,12 @@ export default function App() {
     );
   }
 
-  // --- Helper: extract issue numbers from text ---
   const extractIssueNumbers = (text: string): number[] => {
     if (!text) return [];
     const regex = /(?:fixes|closes|resolves|addresses)?\s*#(\d+)/gi;
     return [...text.matchAll(regex)].map((m) => parseInt(m[1], 10));
   };
 
-  // --- VIEW 2: KANBAN BOARD ---
   if (selectedRepo && data) {
     const issueToPRs: Record<number, number[]> = {};
     const prToIssues: Record<number, number[]> = {};
@@ -1679,7 +2084,6 @@ export default function App() {
               marginBottom: "10px",
             }}
           >
-            {/* Left: Icon & Bold Number (Without ##) */}
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ color: accentStyle, display: "flex", alignItems: "center" }}>
                 {isOpen ? <IssueOpenedIcon size={14} /> : <IssueClosedIcon size={14} />}
@@ -1689,7 +2093,6 @@ export default function App() {
               </span>
             </div>
 
-            {/* Right: Checkout branch indicator & linked items */}
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               {linkedPRs.length > 0 &&
                 linkedPRs.map((prn) => (
@@ -1791,7 +2194,6 @@ export default function App() {
               marginBottom: "10px",
             }}
           >
-            {/* Left: Icon & Bold Number (Without ##) */}
             <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
               <span style={{ color: accentStyle, display: "flex", alignItems: "center" }}>
                 {isMerged ? (
@@ -1807,7 +2209,6 @@ export default function App() {
               </span>
             </div>
 
-            {/* Right: checkout indicators & linked issues */}
             <div
               style={{
                 display: "flex",
@@ -2147,7 +2548,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* ISSUES SECTION */}
         <h2
           style={{
             fontSize: "16px",
@@ -2215,8 +2615,6 @@ export default function App() {
             </div>
           ))}
         </div>
-
-        {/* PRS SECTION */}
         <h2
           style={{
             fontSize: "16px",
@@ -2278,7 +2676,6 @@ export default function App() {
           ))}
         </div>
 
-        {/* Create Issue Modal */}
         {isCreateModalOpen && (
           <div
             style={{
@@ -2419,427 +2816,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Help Guide Modal */}
-        {isHelpOpen && (
-          <div
-            onClick={() => setIsHelpOpen(false)}
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              width: "100vw",
-              height: "100vh",
-              backgroundColor: "rgba(0,0,0,0.85)",
-              zIndex: 20000,
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              padding: "20px",
-              boxSizing: "border-box",
-            }}
-          >
-            <div
-              onClick={(e) => e.stopPropagation()}
-              style={{
-                width: "100%",
-                maxWidth: "1100px",
-                backgroundColor: "#0B0F19",
-                border: "1px solid #1F293D",
-                borderRadius: "20px",
-                padding: "48px",
-                color: "#F8FAFC",
-                boxShadow: "0 24px 64px rgba(0,0,0,0.6)",
-                position: "relative",
-                fontFamily: "inherit",
-              }}
-            >
-              <button
-                onClick={() => setIsHelpOpen(false)}
-                style={{
-                  position: "absolute",
-                  top: "24px",
-                  right: "24px",
-                  background: "none",
-                  border: "none",
-                  color: "#94A3B8",
-                  cursor: "pointer",
-                  fontSize: "24px",
-                  fontWeight: 300,
-                  transition: "color 0.2s",
-                }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "#94A3B8")}
-              >
-                ✕
-              </button>
-
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  marginBottom: "50px",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    marginBottom: "8px",
-                  }}
-                >
-                  <GithubLogoIcon size={32} style={{ color: "#F8FAFC" }} />
-                  <h2
-                    style={{
-                      margin: 0,
-                      fontSize: "32px",
-                      fontWeight: 800,
-                      color: "#fff",
-                      letterSpacing: "-0.5px",
-                    }}
-                  >
-                    Help Guide
-                  </h2>
-                </div>
-                <p style={{ color: "#94A3B8", margin: 0, fontSize: "15px", textAlign: "center" }}>
-                  See how the app automates your workflow on GitHub
-                </p>
-              </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  position: "relative",
-                  gap: "10px",
-                }}
-              >
-                <div
-                  style={{
-                    position: "absolute",
-                    top: "74px",
-                    left: "8%",
-                    right: "8%",
-                    height: "3px",
-                    background:
-                      "linear-gradient(to right, #3B82F6 0%, #10B981 20%, #8B5CF6 40%, #F59E0B 60%, #EF4444 80%, #10B981 100%)",
-                    zIndex: 1,
-                    opacity: 0.8,
-                  }}
-                />
-
-                {[
-                  {
-                    num: 1,
-                    title: "Create Issue",
-                    desc: "The app creates a new GitHub issue.",
-                    color: "#3B82F6",
-                    glow: "rgba(59, 130, 246, 0.15)",
-                    icon: <IssueOpenedIcon size={24} style={{ color: "#3B82F6" }} />,
-                    badge: (
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          padding: "4px 10px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: 700,
-                          border: "1px solid rgba(59, 130, 246, 0.3)",
-                          backgroundColor: "rgba(59, 130, 246, 0.1)",
-                          color: "#3B82F6",
-                        }}
-                      >
-                        #1
-                      </span>
-                    ),
-                  },
-                  {
-                    num: 2,
-                    title: "Create Branch",
-                    desc: "",
-                    color: "#10B981",
-                    glow: "rgba(16, 185, 129, 0.15)",
-                    icon: <BranchIcon size={24} style={{ color: "#10B981" }} />,
-                    badge: (
-                      <div
-                        style={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          gap: "6px",
-                        }}
-                      >
-                        <span
-                          style={{
-                            display: "inline-flex",
-                            padding: "4px 10px",
-                            borderRadius: "6px",
-                            fontSize: "12px",
-                            fontWeight: 700,
-                            border: "1px solid rgba(16, 185, 129, 0.3)",
-                            backgroundColor: "rgba(16, 185, 129, 0.1)",
-                            color: "#10B981",
-                          }}
-                        >
-                          feature/test
-                        </span>
-                        <div
-                          style={{
-                            display: "flex",
-                            gap: "10px",
-                            fontSize: "11px",
-                            color: "#64748B",
-                            fontWeight: 600,
-                          }}
-                        >
-                          <span>✏️ Rename</span>
-                          <br />
-                          <span>🗑️ Delete</span>
-                        </div>
-                      </div>
-                    ),
-                  },
-                  {
-                    num: 3,
-                    title: "Update Code",
-                    desc: "Make changes to your code in VS Code.",
-                    color: "#8B5CF6",
-                    glow: "rgba(139, 92, 246, 0.15)",
-                    icon: <VSCodeIcon size={24} style={{ color: "#8B5CF6" }} />,
-                    badge: (
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          padding: "6px 12px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: 700,
-                          border: "1px solid rgba(139, 92, 246, 0.3)",
-                          backgroundColor: "rgba(139, 92, 246, 0.1)",
-                          color: "#a78bfa",
-                        }}
-                      >
-                        <VSCodeIcon size={12} style={{ color: "#29b6f6" }} /> Open VS Code
-                      </span>
-                    ),
-                  },
-                  {
-                    num: 4,
-                    title: "Commit & Push",
-                    desc: "The app commits your changes and pushes them to GitHub.",
-                    color: "#F59E0B",
-                    glow: "rgba(245, 158, 11, 0.15)",
-                    icon: (
-                      <svg
-                        viewBox="0 0 24 24"
-                        width={24}
-                        height={24}
-                        fill="none"
-                        stroke="#F59E0B"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        style={{ display: "inline-block", verticalAlign: "middle" }}
-                      >
-                        <circle cx="12" cy="12" r="4" />
-                        <line x1="1.05" y1="12" x2="7.95" y2="12" />
-                        <line x1="16.05" y1="12" x2="22.95" y2="12" />
-                      </svg>
-                    ),
-                    badge: (
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          padding: "6px 12px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: 700,
-                          border: "1px solid rgba(245, 158, 11, 0.3)",
-                          backgroundColor: "rgba(245, 158, 11, 0.1)",
-                          color: "#F59E0B",
-                        }}
-                      >
-                        <CheckIcon size={12} style={{ color: "#F59E0B" }} /> Clean repository
-                      </span>
-                    ),
-                  },
-                  {
-                    num: 5,
-                    title: "Pull Request",
-                    desc: "A pull request is created automatically.",
-                    color: "#EF4444",
-                    glow: "rgba(239, 68, 68, 0.15)",
-                    icon: <PrOpenedIcon size={24} style={{ color: "#EF4444" }} />,
-                    badge: (
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          padding: "4px 10px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: 700,
-                          border: "1px solid rgba(239, 68, 68, 0.3)",
-                          backgroundColor: "rgba(239, 68, 68, 0.1)",
-                          color: "#EF4444",
-                        }}
-                      >
-                        PR #2
-                      </span>
-                    ),
-                  },
-                  {
-                    num: 6,
-                    title: "Status",
-                    desc: "Track the status of your workflow in real time.",
-                    color: "#10B981",
-                    glow: "rgba(16, 185, 129, 0.15)",
-                    icon: <CheckIcon size={24} style={{ color: "#10B981" }} />,
-                    badge: (
-                      <span
-                        style={{
-                          display: "inline-flex",
-                          alignItems: "center",
-                          gap: "6px",
-                          padding: "6px 12px",
-                          borderRadius: "6px",
-                          fontSize: "12px",
-                          fontWeight: 700,
-                          border: "1px solid rgba(16, 185, 129, 0.3)",
-                          backgroundColor: "rgba(16, 185, 129, 0.1)",
-                          color: "#10B981",
-                        }}
-                      >
-                        <CheckIcon size={12} /> Success
-                      </span>
-                    ),
-                  },
-                ].map((step, idx) => (
-                  <div
-                    key={step.num}
-                    style={{
-                      flex: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      textAlign: "center",
-                      zIndex: 2,
-                      position: "relative",
-                    }}
-                  >
-                    {idx < 5 && (
-                      <div
-                        style={{
-                          position: "absolute",
-                          top: "72px",
-                          left: "calc(100% - 3px)",
-                          width: "6px",
-                          height: "6px",
-                          borderRadius: "50%",
-                          backgroundColor: "#fff",
-                          boxShadow: "0 0 8px rgba(255,255,255,0.8)",
-                          zIndex: 3,
-                        }}
-                      />
-                    )}
-
-                    <div
-                      style={{
-                        marginBottom: "14px",
-                        display: "flex",
-                        justifyContent: "center",
-                        height: "30px",
-                      }}
-                    >
-                      {step.icon}
-                    </div>
-
-                    <div
-                      style={{
-                        width: "48px",
-                        height: "48px",
-                        borderRadius: "50%",
-                        backgroundColor: "#0B0F19",
-                        border: `4px solid ${step.color}`,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: "18px",
-                        fontWeight: 800,
-                        color: "#fff",
-                        boxShadow: `0 0 20px ${step.glow}`,
-                        marginBottom: "16px",
-                      }}
-                    >
-                      {step.num}
-                    </div>
-
-                    <h3
-                      style={{
-                        margin: "0 0 10px 0",
-                        fontSize: "14px",
-                        fontWeight: 700,
-                        color: "#fff",
-                      }}
-                    >
-                      {step.title}
-                    </h3>
-
-                    <div
-                      style={{
-                        marginBottom: "12px",
-                        minHeight: "45px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                      }}
-                    >
-                      {step.badge}
-                    </div>
-
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "12px",
-                        color: "#64748B",
-                        lineHeight: 1.4,
-                        padding: "0 8px",
-                      }}
-                    >
-                      {step.desc}
-                    </p>
-                  </div>
-                ))}
-              </div>
-
-              <div
-                style={{
-                  marginTop: "48px",
-                  backgroundColor: "rgba(59, 130, 246, 0.05)",
-                  border: "1px solid rgba(59, 130, 246, 0.15)",
-                  borderRadius: "12px",
-                  padding: "16px 20px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "12px",
-                }}
-              >
-                <span style={{ color: "#3B82F6", display: "flex", alignItems: "center" }}>
-                  <InfoIcon size={20} />
-                </span>
-                <p style={{ margin: 0, fontSize: "14px", color: "#94A3B8", fontWeight: 500 }}>
-                  From issue creation to pull request – the app handles the entire workflow so you
-                  can focus on building.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+        {renderHelpGuideModal()}
       </div>
     );
   }
@@ -3186,7 +3163,6 @@ export default function App() {
     );
   }
 
-  // --- VIEW 3: HOME SCREEN ---
   return (
     <div
       style={{
@@ -3197,7 +3173,7 @@ export default function App() {
         color: "var(--text-primary)",
       }}
     >
-      {/* Top Header Bar */}
+      {renderHelpGuideModal()}
       <div
         style={{
           display: "flex",
@@ -3227,7 +3203,6 @@ export default function App() {
           </p>
         </div>
 
-        {/* Profile Card & Account Switcher */}
         {profileStats && (
           <div
             style={{
@@ -3288,7 +3263,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Switch Account Quick Dropdown */}
             <div
               style={{
                 display: "flex",
