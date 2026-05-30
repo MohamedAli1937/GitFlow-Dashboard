@@ -47,7 +47,7 @@ graph TB
 
     subgraph Main["Main Process (Electron + Node.js)"]
         D["main.ts<br/>BrowserWindow + electron-store"]
-        
+
         subgraph IPC["IPC Handlers"]
             E["github.ipc.ts<br/>Account CRUD, Repos, Issues, PRs"]
             F["git.ipc.ts<br/>Status, Branch, Commit, Push"]
@@ -105,21 +105,21 @@ Each step in the pipeline is tracked visually on the detail page. The app automa
 
 ## ✨ Key Features
 
-| Feature | Description |
-|---|---|
+| Feature                   | Description                                                                |
+| ------------------------- | -------------------------------------------------------------------------- |
 | **Multi-Account Support** | Add, switch, and delete multiple GitHub accounts with secure local storage |
-| **Repository Browser** | View all your repos with description, visibility, and quick-actions |
-| **Issue & PR Tracking** | See open/closed/merged status with color-coded cards |
-| **Visual Pipeline** | Step-by-step progress tracker: Issue → Branch → Code → Commit → PR |
-| **Local Git Integration** | Link repos to local folders for real-time branch/status monitoring |
-| **Branch Management** | Create, rename, delete, and switch branches from the app |
-| **Commit & Push** | Stage all changes, write a commit message, and push — one click |
-| **PR Creation** | Open pull requests directly from the current branch |
-| **VS Code Integration** | Open any linked repo in VS Code with one click |
-| **Profile & Stats** | View your GitHub profile, repo count, total issues, and total PRs |
-| **Help Guide** | Built-in interactive help page explaining the full workflow |
-| **Auto-Refresh** | Issues and PRs refresh automatically every 15 seconds |
-| **Dark Theme** | Premium GitHub-inspired dark UI with smooth animations |
+| **Repository Browser**    | View all your repos with description, visibility, and quick-actions        |
+| **Issue & PR Tracking**   | See open/closed/merged status with color-coded cards                       |
+| **Visual Pipeline**       | Step-by-step progress tracker: Issue → Branch → Code → Commit → PR         |
+| **Local Git Integration** | Link repos to local folders for real-time branch/status monitoring         |
+| **Branch Management**     | Create, rename, delete, and switch branches from the app                   |
+| **Commit & Push**         | Stage all changes, write a commit message, and push — one click            |
+| **PR Creation**           | Open pull requests directly from the current branch                        |
+| **VS Code Integration**   | Open any linked repo in VS Code with one click                             |
+| **Profile & Stats**       | View your GitHub profile, repo count, total issues, and total PRs          |
+| **Help Guide**            | Built-in interactive help page explaining the full workflow                |
+| **Auto-Refresh**          | Issues and PRs refresh automatically every 15 seconds                      |
+| **Dark Theme**            | Premium GitHub-inspired dark UI with smooth animations                     |
 
 ---
 
@@ -129,9 +129,9 @@ Each step in the pipeline is tracked visually on the detail page. The app automa
 
 1. Go to the [Releases](https://github.com/MohamedAli1937/GitFlow-Dashboard/releases) page.
 2. Download the installer for your platform:
-   - **Windows**: `GitFlow Dashboard-Windows-0.1.0-Setup.exe`
-   - **macOS**: `GitFlow Dashboard-Mac-0.1.0-Installer.dmg`
-   - **Linux**: `GitFlow Dashboard-Linux-0.1.0.AppImage`
+   - **Windows**: `GitFlow Dashboard-Windows-1.0.0-Setup.exe`
+   - **macOS**: `GitFlow Dashboard-Mac-1.0.0-Installer.dmg`
+   - **Linux**: `GitFlow Dashboard-Linux-1.0.0.AppImage`
 3. Run the installer and follow the on-screen instructions.
 4. Launch the app and add your GitHub Personal Access Token (PAT).
 
@@ -160,22 +160,20 @@ npm run dev
 npm run build
 ```
 
-The installer will be generated in `release/0.1.0/`.
-
 ---
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology | Purpose |
-|---|---|---|
-| **Frontend** | React 18, TypeScript 5 | UI components and state management |
-| **Desktop Shell** | Electron 30 | Cross-platform desktop wrapper |
-| **Build Tool** | Vite 5 | Fast HMR dev server and production bundler |
-| **GitHub API** | `@octokit/rest` | Authenticated REST API calls |
-| **Local Git** | `simple-git` | Git CLI operations (status, branch, commit, push) |
-| **Storage** | `electron-store` | Secure local storage for accounts and tokens |
-| **Packaging** | `electron-builder` | NSIS (Windows), DMG (macOS), AppImage (Linux) |
-| **Linting** | ESLint + Prettier | Code quality and formatting |
+| Layer             | Technology             | Purpose                                           |
+| ----------------- | ---------------------- | ------------------------------------------------- |
+| **Frontend**      | React 18, TypeScript 5 | UI components and state management                |
+| **Desktop Shell** | Electron 30            | Cross-platform desktop wrapper                    |
+| **Build Tool**    | Vite 5                 | Fast HMR dev server and production bundler        |
+| **GitHub API**    | `@octokit/rest`        | Authenticated REST API calls                      |
+| **Local Git**     | `simple-git`           | Git CLI operations (status, branch, commit, push) |
+| **Storage**       | `electron-store`       | Secure local storage for accounts and tokens      |
+| **Packaging**     | `electron-builder`     | NSIS (Windows), DMG (macOS), AppImage (Linux)     |
+| **Linting**       | ESLint + Prettier      | Code quality and formatting                       |
 
 ---
 
@@ -236,6 +234,7 @@ Update the `version` field in `package.json`:
 ```
 
 Use [Semantic Versioning](https://semver.org/):
+
 - **Patch** (`0.1.1`): Bug fixes, no new features.
 - **Minor** (`0.2.0`): New features, backward compatible.
 - **Major** (`1.0.0`): Breaking changes.
