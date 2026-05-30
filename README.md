@@ -28,6 +28,14 @@ GitFlow Dashboard is a **cross-platform desktop application** that brings a visu
 - **Tracking** a visual pipeline: `Issue → Branch → Code → Commit → PR → Merge`.
 - **Managing** multiple GitHub accounts with secure local token storage.
 - **Linking** GitHub repos to local folders for real-time Git status monitoring.
+  
+---
+
+## 📸 Demo
+
+
+https://github.com/user-attachments/assets/e8f63577-7135-44d3-997e-246d6450c31c
+
 
 ---
 
