@@ -5,7 +5,7 @@
   "asar": true,
   "productName": "GitFlow Dashboard",
   "directories": {
-    "output": "release/${version}"
+    "output": "../GitFlow-Dashboard-release/${version}"
   },
   "files": [
     "dist",

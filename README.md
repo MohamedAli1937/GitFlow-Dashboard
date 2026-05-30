@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-0.1.0-blue?style=flat-square" alt="Version" />
+  <img src="https://img.shields.io/github/v/release/MohamedAli1937/GitFlow-Dashboard?style=flat-square" alt="Version" />
   <img src="https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-brightgreen?style=flat-square" alt="Platform" />
   <img src="https://img.shields.io/badge/electron-30-9cf?style=flat-square&logo=electron" alt="Electron" />
   <img src="https://img.shields.io/badge/react-18-61DAFB?style=flat-square&logo=react" alt="React" />
@@ -129,9 +129,9 @@ Each step in the pipeline is tracked visually on the detail page. The app automa
 
 1. Go to the [Releases](https://github.com/MohamedAli1937/GitFlow-Dashboard/releases) page.
 2. Download the installer for your platform:
-   - **Windows**: `GitFlow Dashboard-Windows-1.0.0-Setup.exe`
-   - **macOS**: `GitFlow Dashboard-Mac-1.0.0-Installer.dmg`
-   - **Linux**: `GitFlow Dashboard-Linux-1.0.0.AppImage`
+   - **Windows**: `.exe` installer (e.g., `GitFlow Dashboard-Windows-<version>-Setup.exe`)
+   - **macOS**: `.dmg` installer (e.g., `GitFlow Dashboard-Mac-<version>-Installer.dmg`)
+   - **Linux**: `.AppImage` package (e.g., `GitFlow Dashboard-Linux-<version>.AppImage`)
 3. Run the installer and follow the on-screen instructions.
 4. Launch the app and add your GitHub Personal Access Token (PAT).
 
@@ -225,19 +225,19 @@ Edit the source code as needed (fix bugs, add features, etc.).
 
 ### Step 2: Bump the Version
 
-Update the `version` field in `package.json`:
+Update the `version` field in `package.json` to the target version (e.g., `1.0.0` or `1.0.1` following Semantic Versioning):
 
 ```json
 {
-  "version": "0.2.0"
+  "version": "1.0.0"
 }
 ```
 
 Use [Semantic Versioning](https://semver.org/):
 
-- **Patch** (`0.1.1`): Bug fixes, no new features.
-- **Minor** (`0.2.0`): New features, backward compatible.
-- **Major** (`1.0.0`): Breaking changes.
+- **Patch** (`x.x.1`): Bug fixes, no new features.
+- **Minor** (`x.1.x`): New features, backward compatible.
+- **Major** (`1.x.x`): Breaking changes.
 
 ### Step 3: Build the Installer
 
@@ -245,23 +245,23 @@ Use [Semantic Versioning](https://semver.org/):
 npm run build
 ```
 
-This runs `tsc → vite build → electron-builder` and generates the installer in `release/<version>/`.
+This runs `tsc → vite build → electron-builder` and generates the installer.
 
 ### Step 4: Commit & Tag
 
 ```bash
 git add .
-git commit -m "release: v0.2.0"
-git tag v0.2.0
+git commit -m "release: v1.0.0"
+git tag v1.0.0
 git push origin main --tags
 ```
 
 ### Step 5: Create a GitHub Release
 
 1. Go to your repo → **Releases** → **Draft a new release**.
-2. Select the tag you just pushed (e.g., `v0.2.0`).
+2. Select the tag you just pushed (e.g., `v1.0.0`).
 3. Write release notes describing what changed.
-4. Upload the installer files from `release/<version>/`:
+4. Upload the installer files from the build output directory:
    - `.exe` for Windows
    - `.dmg` for macOS
    - `.AppImage` for Linux
