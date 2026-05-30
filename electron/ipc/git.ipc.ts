@@ -1,5 +1,12 @@
 import { ipcMain, dialog } from "electron";
-import { getGitStatus, isGitRepo, createBranch, commitAndPush, renameBranch, deleteBranch } from "../services/git.service";
+import {
+  getGitStatus,
+  isGitRepo,
+  createBranch,
+  commitAndPush,
+  renameBranch,
+  deleteBranch,
+} from "../services/git.service";
 
 ipcMain.handle("git:select-folder", async () => {
   const result = await dialog.showOpenDialog({
@@ -32,9 +39,12 @@ ipcMain.handle("git:commit-push", async (_event, path: string, message: string) 
   return await commitAndPush(path, message);
 });
 
-ipcMain.handle("git:rename-branch", async (_event, path: string, oldName: string, newName: string) => {
-  return await renameBranch(path, oldName, newName);
-});
+ipcMain.handle(
+  "git:rename-branch",
+  async (_event, path: string, oldName: string, newName: string) => {
+    return await renameBranch(path, oldName, newName);
+  }
+);
 
 ipcMain.handle("git:delete-branch", async (_event, path: string, name: string) => {
   return await deleteBranch(path, name);

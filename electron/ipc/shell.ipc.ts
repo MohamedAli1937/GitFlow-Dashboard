@@ -1,4 +1,4 @@
-import { ipcMain } from "electron";
+import { ipcMain, shell } from "electron";
 import { exec } from "child_process";
 
 ipcMain.handle("shell:open-vscode", async (_event, path: string) => {
@@ -13,4 +13,9 @@ ipcMain.handle("shell:open-vscode", async (_event, path: string) => {
       }
     });
   });
+});
+
+ipcMain.handle("shell:open-external", async (_event, url: string) => {
+  await shell.openExternal(url);
+  return true;
 });

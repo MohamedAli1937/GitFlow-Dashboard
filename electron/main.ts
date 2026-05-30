@@ -2,12 +2,14 @@ import "dotenv/config";
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import Store from "electron-store";
 
 import "./ipc/github.ipc";
 import "./ipc/git.ipc";
 import "./ipc/shell.ipc";
 import { setToken } from "./services/github.service";
 
+export const store = new Store();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 process.env.APP_ROOT = path.join(__dirname, "..");
@@ -28,7 +30,14 @@ function createWindow() {
     },
   });
 
-  setToken(process.env.GITHUB_TOKEN || "");
+  // Load active account token on startup
+  const activeUsername = store.get("active_username") as string | undefined;
+  const accounts = (store.get("github_accounts") as any[] | undefined) || [];
+  const activeAccount = activeUsername
+    ? accounts.find((a: any) => a.username === activeUsername)
+    : null;
+  const token = activeAccount?.token || store.get("github_token") || process.env.GITHUB_TOKEN || "";
+  setToken(token as string);
 
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);

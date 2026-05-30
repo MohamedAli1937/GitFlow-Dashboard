@@ -45,7 +45,7 @@ export async function commitAndPush(path: string, message: string) {
     const git = simpleGit(path);
     await git.add(".");
     await git.commit(message);
-    
+
     // Get current branch name and push with --set-upstream so new branches work
     const branch = await git.revparse(["--abbrev-ref", "HEAD"]);
     await git.push(["-u", "origin", branch]);
@@ -71,18 +71,26 @@ export async function deleteBranch(path: string, name: string) {
   try {
     const git = simpleGit(path);
     const branches = await git.branchLocal();
-    
+
     try {
       // Force delete the branch
       await git.branch(["-D", name]);
     } catch (deleteErr: any) {
       // If it fails because it's checked out (used by worktree), switch to another branch and retry
-      if (deleteErr.message && (deleteErr.message.includes("used by worktree") || deleteErr.message.includes("checked out at"))) {
-        let defaultBranch = branches.all.includes("main") ? "main" : (branches.all.includes("master") ? "master" : undefined);
+      if (
+        deleteErr.message &&
+        (deleteErr.message.includes("used by worktree") ||
+          deleteErr.message.includes("checked out at"))
+      ) {
+        let defaultBranch = branches.all.includes("main")
+          ? "main"
+          : branches.all.includes("master")
+            ? "master"
+            : undefined;
         if (!defaultBranch) {
-          defaultBranch = branches.all.find(b => b !== name && !b.startsWith("*"));
+          defaultBranch = branches.all.find((b) => b !== name && !b.startsWith("*"));
         }
-        
+
         if (defaultBranch) {
           await git.checkout(defaultBranch);
           await git.branch(["-D", name]); // Retry delete after switching
@@ -93,7 +101,7 @@ export async function deleteBranch(path: string, name: string) {
         throw deleteErr;
       }
     }
-    
+
     return true;
   } catch (error) {
     console.error("Delete Branch Error:", error);

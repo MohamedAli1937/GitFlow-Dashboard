@@ -4,9 +4,28 @@ let octokit: Octokit | null = null;
 let cachedUsername: string | null = null;
 
 export function setToken(token: string) {
+  if (!token) {
+    octokit = null;
+    cachedUsername = null;
+    return;
+  }
   octokit = new Octokit({
     auth: token,
   });
+  cachedUsername = null;
+}
+
+export async function verifyAndSetToken(token: string) {
+  if (!token) throw new Error("Token cannot be empty");
+  const tempOctokit = new Octokit({ auth: token });
+  const user = await tempOctokit.rest.users.getAuthenticated();
+  octokit = tempOctokit;
+  cachedUsername = user.data.login;
+  return user.data;
+}
+
+export function clearTokenService() {
+  octokit = null;
   cachedUsername = null;
 }
 
@@ -26,7 +45,14 @@ export async function createIssue(owner: string, repo: string, title: string, bo
   }
 }
 
-export async function createPR(owner: string, repo: string, title: string, body: string, head: string, base: string) {
+export async function createPR(
+  owner: string,
+  repo: string,
+  title: string,
+  body: string,
+  head: string,
+  base: string
+) {
   if (!octokit) throw new Error("No GitHub token set");
   try {
     const response = await octokit.rest.pulls.create({
@@ -57,6 +83,9 @@ export async function getRepos() {
     name: repo.name,
     full_name: repo.full_name,
     private: repo.private,
+    owner: { login: repo.owner.login, avatar_url: repo.owner.avatar_url },
+    description: repo.description || "",
+    html_url: repo.html_url,
   }));
 }
 
@@ -91,7 +120,7 @@ export async function getRepoDetails(owner: string, repo: string) {
           repo: t.repo,
           state: "all",
           per_page: 100,
-          headers: { 'If-None-Match': '', 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+          headers: { "If-None-Match": "", "Cache-Control": "no-cache", Pragma: "no-cache" },
         }),
 
         octokit!.paginate(octokit!.rest.pulls.list, {
@@ -99,7 +128,7 @@ export async function getRepoDetails(owner: string, repo: string) {
           repo: t.repo,
           state: "all",
           per_page: 100,
-          headers: { 'If-None-Match': '', 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+          headers: { "If-None-Match": "", "Cache-Control": "no-cache", Pragma: "no-cache" },
         }),
       ]);
 
@@ -149,5 +178,54 @@ export async function getRepoDetails(owner: string, repo: string) {
       body: p.body || "",
       repo: p.base.repo.full_name,
     })),
+  };
+}
+
+export async function getUserStats() {
+  if (!octokit) throw new Error("No GitHub token set");
+
+  if (!cachedUsername) {
+    const user = await octokit.rest.users.getAuthenticated();
+    cachedUsername = user.data.login;
+  }
+  const username = cachedUsername;
+
+  const userInfo = await octokit.rest.users.getAuthenticated();
+
+  // Use Search API to count issues and PRs authored by this user
+  let totalIssues = 0;
+  let totalPRs = 0;
+  try {
+    const issueSearch = await octokit.rest.search.issuesAndPullRequests({
+      q: `author:${username} is:issue`,
+      per_page: 1,
+    });
+    totalIssues = issueSearch.data.total_count;
+  } catch {
+    /* search may fail on rate limit, default to 0 */
+  }
+
+  try {
+    const prSearch = await octokit.rest.search.issuesAndPullRequests({
+      q: `author:${username} is:pr`,
+      per_page: 1,
+    });
+    totalPRs = prSearch.data.total_count;
+  } catch {
+    /* search may fail on rate limit, default to 0 */
+  }
+
+  return {
+    username: userInfo.data.login,
+    avatar_url: userInfo.data.avatar_url,
+    name: userInfo.data.name || userInfo.data.login,
+    bio: userInfo.data.bio || "",
+    followers: userInfo.data.followers,
+    following: userInfo.data.following,
+    public_repos: userInfo.data.public_repos,
+    total_repos: userInfo.data.public_repos + (userInfo.data.total_private_repos || 0),
+    total_issues: totalIssues,
+    total_prs: totalPRs,
+    html_url: userInfo.data.html_url,
   };
 }
